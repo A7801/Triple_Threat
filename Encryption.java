@@ -1,98 +1,25 @@
 import java.util.Scanner;
+
 class Encryption 
 {
-    String key;
-    String str;
-    int r;
-    String sec;
-    String Cypher;
-    public Encryption(String strs, int rr, String lmd)
+    protected String key;
+    private String str;
+    protected int r;
+    private String sec;
+    public String Cypher;
+
+    public void input()
     {
+        Scanner sc = new Scanner(System.in);
+        str = sc.nextLine();
+        sec = sc.nextLine();
         key = "";
-        str = strs;
-        r = rr;
-        sec = lmd;
         Cypher = "";
+        r = 10;
+        sc.close();
     }
 
-
-    public void De_crypt()
-    {
-        int data[][] = new int [r][r];
-        char c = key.charAt(10);
-        int u = c-48;
-        int y =0;
-        int count = 0;
-        int tmp =0;
-        for(int i =0; i<Cypher.length(); i++)
-        {
-            if(y==(u-1))
-            {
-                while(i<Cypher.length() && Cypher.charAt(i)!=32)
-                {
-                    c = Cypher.charAt(i);
-                    tmp = tmp*10 +(c-48);
-                    i++;
-                }
-                data[count/r][count%r] = tmp;
-                System.out.println(tmp + " ");
-                count++;
-                y=0;
-                i++;
-                tmp=0;
-            }
-            if( i<Cypher.length() && Cypher.charAt(i)!=32)
-               y++;
-        }
-        System.out.println(count);
-        for(int i = 0; i<r; i++)
-        {
-            for(int j =0; j<r; j++)
-            {
-                System.out.print(data[i][j] + "  ");
-            }
-            System.out.println();
-        }
-        De_Mat(data);
-    }
-
-    public void De_Mat(int data[][])
-    {
-        char c;
-        int temp =0;
-        int h[][] = new int[r][r];
-        for(int i = 0; i<r; i++)
-        {
-           c = key.charAt(i);
-           temp = c - 48;
-           for(int j =0; j<r; j++)
-           {
-               if(j==temp)
-                h[j][i] = 1;
-               else 
-                h[j][i] =0;
-           }
-        }
-        int key2[] = new int[sec.length()];
-        for(int i =0; i<sec.length(); i++)
-        {
-            key2[i] = (int)sec.charAt(i);
-        }
-        XOR(data, key2);
-        Scramblerow(data, h);
-        System.out.println();
-        System.out.println();
-        for(int i = 0; i<r; i++)
-        {
-            for(int j=0; j<r; j++)
-            {
-                System.out.print((char)(data[i][j]));
-            }
-            System.out.println();
-        }
-    }
-
-	public void Encrypt()
+	protected void Encrypt()
 	{
 		int [][] data=new int[r][r];
 		int ptr=0;
@@ -125,10 +52,9 @@ class Encryption
         {
             key = key + sec.charAt(i);
         }
-        System.out.println();
 	}
 
-    public void Mat_gen(int p[][])
+    private void Mat_gen(int p[][])
     {
         char c;
         int []a = new int[r];
@@ -158,7 +84,7 @@ class Encryption
         Scramblerow(p, Mat);
     }
 
-	public void XOR(int [][]data,int []key)
+	protected void XOR(int [][]data,int []key)
 	{
 		int ptr=0;
 		int [][]encrypted = new int[r][r];
@@ -180,7 +106,7 @@ class Encryption
         }
 	}
 
-    public void Scramblerow (int [][]data,int[][]key)
+    protected void Scramblerow (int [][]data,int[][]key)
     {
         int sum;
         int [][]scramble=new int[r][r];
@@ -205,7 +131,7 @@ class Encryption
         }
     }
 
-    public void print_garb(int [][]data)
+    private void print_garb(int [][]data)
     {
         int t = 0;
         double f =0;
@@ -224,18 +150,88 @@ class Encryption
          t =  data[(q/r)][(q%r)];
         Cypher = Cypher + Integer.toString(t) + " ";
        }
-       System.out.println("Your special key :" + key);
-       System.out.println("Your Encrypted massage :" + Cypher.length());
     }
 
-    public static void main(String args[]) 
+}
+
+class Decrypt extends Encryption
+{
+    protected void decrypt()
     {
-        Scanner sc = new Scanner(System.in);
-        String t = sc.nextLine();
-        String k2 = sc.nextLine();
-        Encryption crypt = new Encryption(t,10,k2);
-        crypt.Encrypt();
-        crypt.De_crypt();
-        sc.close();
+        int data[][] = new int [r][r];
+        char c = key.charAt(r);
+        int u = c-48;
+        int y =0;
+        int count = 0;
+        int tmp =0;
+        for(int i =0; i<Cypher.length(); i++)
+        {
+            if(y==(u-1))
+            {
+                while(i<Cypher.length() && Cypher.charAt(i)!=32)
+                {
+                    c = Cypher.charAt(i);
+                    tmp = tmp*10 +(c-48);
+                    i++;
+                }
+                data[count/r][count%r] = tmp;
+                count++;
+                y=0;
+                i++;
+                tmp=0;
+            }
+            if( i<Cypher.length() && Cypher.charAt(i)==32)
+               y++;
+        }
+        De_Mat(data);
     }
+
+    private void De_Mat(int data[][])
+    {
+        char c;
+        int temp =0;
+        int h[][] = new int[r][r];
+        for(int i = 0; i<r; i++)
+        {
+           c = key.charAt(i);
+           temp = c - 48;
+           for(int j =0; j<r; j++)
+           {
+               if(j==temp)
+                h[j][i] = 1;
+               else 
+                h[j][i] =0;
+           }
+        }
+        int key2[] = new int[key.length()-11];
+        for(int i =0; i<key.length()-11; i++)
+        {
+            key2[i] = (int)key.charAt(i+11);
+        }
+        XOR(data, key2);
+        Scramblerow(data, h);
+        System.out.println();
+        System.out.println("Decrypted message :");
+        for(int i = 0; i<r; i++)
+        {
+            for(int j=0; j<r; j++)
+            {
+                System.out.print((char)(data[i][j]));
+            }
+        }
+    }
+      
+}
+
+class ex1
+{
+     public static void main(String args[])
+     {
+          Decrypt decypher = new Decrypt();
+          decypher.input();
+          decypher.Encrypt();
+          System.out.println("Your message : "+(decypher.Cypher));
+          System.out.println("Your Key : "+decypher.key);
+          decypher.decrypt();
+     }
 }
